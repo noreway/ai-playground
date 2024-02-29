@@ -31,30 +31,44 @@ OLLAMA_MODELS = {
     #    Answer: [/INST]
     #    """,
     'mistral': """
-        <s> [INST] 
-        You are an retrieval augmented generation assistant. 
+        <s> [INST]
+        You are an retrieval augmented generation assistant.
         The provided context contains documents related to the question.
-        Use the following documents only to answer the question. 
+        Use the following documents only to answer the question.
         All documents containing relevant pieces of the answer must be referenced by source and page.
-        If you don't know the answer, just say that you don't know. 
+        If you don't know the answer, just say that you don't know.
         [/INST] </s>
-        [INST] 
-        Context: {context} 
-        Question: {question} 
+        [INST]
+        Context: {context}
+        Question: {question}
         Answer:
         References:
         [/INST]
         """,
+    #'llama2': """
+    #    [INST] <<SYS>>Answer the users question only taking into account the following context. 
+    #    If the user asks for information not found in the below context, do not answer.
+    #
+    #    <context>
+    #    {context}
+    #    </context>
+    #    <</SYS>>
+    #
+    #     {question} [/INST]
+    #    """,
     'llama2': """
-        [INST] <<SYS>>Answer the users question only taking into account the following context. 
+        [INST] <<SYS>>
+        Answer the users question only taking into account the following context.
         If the user asks for information not found in the below context, do not answer.
+        All context documents containing relevant pieces of the answer must be referenced by source and page.
 
         <context>
         {context}
         </context>
         <</SYS>>
-
-         {question} [/INST]
+        
+        {question}
+        [/INST]
         """,
     'gpt-3.5-turbo': """
         System:
@@ -80,7 +94,7 @@ OLLAMA_MODELS = {
         You are an retrieval augmented generation assistant. 
         The provided context contains documents related to the question.
         Use the document property page_content only to answer the question. 
-        All documents containing relevant pieces of the answer must be referenced with the metadata properties source and page, use format [source, page].
+        All documents containing pieces of the answer must be referenced with the metadata properties source and page, use format [source, page].
         If you don't know the answer, just say that you don't know. 
 
         Context documents:
@@ -134,7 +148,8 @@ class ChatAssistant:
             self.model = ChatOpenAI(model_name=model_name, temperature=0.2,
                 openai_api_key=OPENAI_API_KEY, openai_organization=OPENAI_ORG_ID)
         else:
-            self.model = ChatOllama(model=model_name, base_url=OLLAMA_BASE_URL)
+            self.model = ChatOllama(model=model_name, temperature=0.01, 
+                base_url=OLLAMA_BASE_URL)
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
         self.prompt = PromptTemplate.from_template(OLLAMA_MODELS[model_name])

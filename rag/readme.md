@@ -18,7 +18,7 @@ winpty docker exec -it ai-playground-rag_ollama ollama pull llama2
 
 # App öffnen
 - http://localhost:8501
-- In der Sidebar Sprachmodell auswählen (gpt-* Varianten sind nur verfügbar wenn OpenAI API Key definiert wurde)
+- In der Sidebar Sprachmodell auswählen (gpt-x Varianten sind nur verfügbar wenn OpenAI API Key definiert wurde)
 - Eine Knowledge Base anlegen und Dokumente hochladen
 - Fragen...
 
@@ -49,21 +49,3 @@ Confluence Loader:
 
 Mistral Prompt:
 - https://www.promptingguide.ai/models/mistral-7b#capabilities
-
-# Erkenntnisse
- - Es gibt zwei Richtungen
-   - Die grosse Sprachmodelle wie GPT (externr Betrieb, Datenschutz, Rechtliches, Ausland)
-   - Lokales Hosting mit öffentlichen Sprachmodellen (kleine Modelle, langsam, hoher Leistungsbedarf)
- - Wir können kein eigenes LLM trainieren und müssen bestehende benutzen, diese kennen die Inhalte der kunden nicht.
-   Der RAG Ansatz wird für uns eine wichtige Architektur sein.
- - Als Sprache werden wir wohl Python benutzen müssen um vielseitige und aktuelle Auswahl an Tools und Dokumentation/Beispielen zu haben.
-   Das lokale Hosting ist bereits Einschränkung genug.
- - Die App kann trotzdem auf dem Blueprint aufbauen, nur die RAG-Chain wird mit Python gebaut und bietet dann eine REST API für QA-Abfragen.
- - Wir haben viel zu lernen. Verständnis ist hier wichtig, auch wenn wir die "Tools" nur benutzen.
- - Daher schnelles Prototyping mit Docker Compose (Hosting), Ollama (LLM Server), LangChain (RAG Framework), Chroma (Vector Datenbank) und Streamlit (Proto App mit UI) hilfreich.
- - Debugging mit LangSmith sehr hilfreich (z.B. Warum macht er mir keine Referenzen mit den originalen Dateinamen?, Wie sieht der fertige Prompt aus?)
- - Prompt Engineering ist wichtig und schwierig!
- - LLM wechseln bedeutet auch Prompt wehseln und neu tüfteln, messen, tunen.
- - OpenAI GPT ist deutlich schnellen als Ollama lokal, unklar wie viel macht das Model und wie viel das Hosting, bzw. die Hardware aus.
-
- 
