@@ -1,46 +1,53 @@
 
 # prerequisits
-# install docker desktop
-# create a Langsmith account, optional
-# create and OpenAI account, optional
-# copy rename .env.template to .env and add required settings
+- install docker desktop
+- create a Langsmith account, optional
+- create and OpenAI account, optional
+- copy rename .env.template to .env and add required settings
 
 # build and run
+```bash
 docker compose up --build
+```
 
 # pull models
+```bash
 winpty docker exec -it ai-playground-rag_ollama ollama pull mistral
 winpty docker exec -it ai-playground-rag_ollama ollama pull llama2
+```
 
+# open app
+at http://localhost:8501
 
+# links
 used tutorial:
-https://medium.com/@vndee.huynh/build-your-own-rag-and-run-it-locally-langchain-ollama-streamlit-181d42805895
+- https://medium.com/@vndee.huynh/build-your-own-rag-and-run-it-locally-langchain-ollama-streamlit-181d42805895
 
 langchain guide:
-https://nanonets.com/blog/langchain/
-https://www.infoworld.com/article/3705035/5-easy-ways-to-run-an-llm-locally.html?page=2
+- https://nanonets.com/blog/langchain/
+- https://www.infoworld.com/article/3705035/5-easy-ways-to-run-an-llm-locally.html?page=2
 
 ollama examples:
-https://python.langchain.com/docs/integrations/llms/ollama
-https://github.com/ollama/ollama/tree/main/examples
+- https://python.langchain.com/docs/integrations/llms/ollama
+- https://github.com/ollama/ollama/tree/main/examples
 
 run ollama in docker:
-https://khandelwal-shekhar.medium.com/deploy-ollama-using-official-docker-image-c09a27cd332f
-https://github.com/valiantlynx/ollama-docker/blob/main/src/rag.py
+- https://khandelwal-shekhar.medium.com/deploy-ollama-using-official-docker-image-c09a27cd332f
+- https://github.com/valiantlynx/ollama-docker/blob/main/src/rag.py
 
 chroma in separate docker container:
-https://abhishektatachar.medium.com/run-chroma-db-on-a-local-machine-and-as-a-docker-container-a9d4b91d2a97
+- https://abhishektatachar.medium.com/run-chroma-db-on-a-local-machine-and-as-a-docker-container-a9d4b91d2a97
 
 confluence loader:
-https://python.langchain.com/docs/integrations/document_loaders/confluence
-https://medium.com/@jeffgeiser/confluence-and-langchain-735c67db193a
-https://medium.com/@ahmed.mohiuddin.architecture/ai-powered-confluence-search-using-langchain-azure-openai-and-azure-cognitive-search-f9765c625b70
-https://www.shakudo.io/blog/building-confluence-kb-qanda-app-langchain-chatgpt
+- https://python.langchain.com/docs/integrations/document_loaders/confluence
+- https://medium.com/@jeffgeiser/confluence-and-langchain-735c67db193a
+- https://medium.com/@ahmed.mohiuddin.architecture/ai-powered-confluence-search-using-langchain-azure-openai-and-azure-cognitive-search-f9765c625b70
+- https://www.shakudo.io/blog/building-confluence-kb-qanda-app-langchain-chatgpt
 
 mistral prompt:
-https://www.promptingguide.ai/models/mistral-7b#capabilities
+- https://www.promptingguide.ai/models/mistral-7b#capabilities
 
-erkenntnisse:
+# Erkenntnisse
  - grosse llm wie gpt4 (extern, daten, rechtliches) vs. lokales hosting (kleine modelle, langsam, hoher leistungsbedarf)
  - wir können kein eigenes llm trainieren und müssen bestehende benutzen, diese kennen die inhalte der kunden nicht
    RAG wird für uns eine wichtige architektur sein
