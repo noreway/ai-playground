@@ -1,0 +1,55 @@
+version: '3'
+name: ai-playground-rag
+
+services:
+  ollama: 
+    image: ollama/ollama:latest
+    container_name: '${COMPOSE_PROJECT_NAME}_ollama'
+    volumes:
+      - ollama:/root/.ollama
+    networks:
+      - net
+    ports:
+      - 11434:11434
+
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: '${COMPOSE_PROJECT_NAME}_chroma'
+    volumes:
+      - chroma:/chroma/chroma
+    networks:
+      - net
+    ports:
+      - 8000:8000
+
+  app:
+    build: ./app
+    container_name: '${COMPOSE_PROJECT_NAME}_app'
+    environment:
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://ollama:11434}
+      - CHROMA_HOST=${CHROMA_HOST-chroma}
+      - CHROMA_PORT=${CHROMA_PORT-8000}
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
+      - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - OPENAI_ENABLED=${OPENAI_ENABLED-false}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+    depends_on:
+      - ollama
+      - chroma
+    networks:
+      - net
+    ports:
+      - 8501:8501
+
+volumes:
+  ollama:
+    name: ollama
+
+  chroma:
+    name: '${COMPOSE_PROJECT_NAME}_chroma'
+
+networks:
+  net:
