@@ -1,63 +1,69 @@
 
-# prerequisits
-- install docker desktop
-- create a Langsmith account, optional
-- create and OpenAI account, optional
-- copy rename .env.template to .env and add required settings
+# Vorbereitungen
+- Docker Desktop installieren https://www.docker.com/products/docker-desktop/
+- LangSmith Konto erstellen und API Key generieren https://smith.langchain.com/ (optional)
+- OpenAI Konto erstellen und API Key generieren https://platform.openai.com/ (optional)
+- `.env.template` zu `.env` kopieren und Konfiguration anpassen (für LangSmith und OpenAI)
 
-# build and run
+# Starten
 ```bash
 docker compose up --build
 ```
 
-# pull models
+# Benutze Sprachmodelle laden
 ```bash
 winpty docker exec -it ai-playground-rag_ollama ollama pull mistral
 winpty docker exec -it ai-playground-rag_ollama ollama pull llama2
 ```
 
-# open app
-at http://localhost:8501
+# App öffnen
+- http://localhost:8501
+- In der Sidebar Sprachmodell auswählen (gpt-* Varianten sind nur verfügbar wenn OpenAI API Key definiert wurde)
+- Eine Knowledge Base anlegen und Dokumente hochladen
+- Fragen...
 
-# links
-used tutorial:
+# Links
+Gutes Tutorial:
 - https://medium.com/@vndee.huynh/build-your-own-rag-and-run-it-locally-langchain-ollama-streamlit-181d42805895
 
-langchain guide:
+LangChain:
 - https://nanonets.com/blog/langchain/
 - https://www.infoworld.com/article/3705035/5-easy-ways-to-run-an-llm-locally.html?page=2
 
-ollama examples:
+Ollama Beispiele:
 - https://python.langchain.com/docs/integrations/llms/ollama
 - https://github.com/ollama/ollama/tree/main/examples
 
-run ollama in docker:
+Ollama in Docker ausführen:
 - https://khandelwal-shekhar.medium.com/deploy-ollama-using-official-docker-image-c09a27cd332f
 - https://github.com/valiantlynx/ollama-docker/blob/main/src/rag.py
 
-chroma in separate docker container:
+ChromaDB in separatem Docker Container ausführen:
 - https://abhishektatachar.medium.com/run-chroma-db-on-a-local-machine-and-as-a-docker-container-a9d4b91d2a97
 
-confluence loader:
+Confluence Loader:
 - https://python.langchain.com/docs/integrations/document_loaders/confluence
 - https://medium.com/@jeffgeiser/confluence-and-langchain-735c67db193a
 - https://medium.com/@ahmed.mohiuddin.architecture/ai-powered-confluence-search-using-langchain-azure-openai-and-azure-cognitive-search-f9765c625b70
 - https://www.shakudo.io/blog/building-confluence-kb-qanda-app-langchain-chatgpt
 
-mistral prompt:
+Mistral Prompt:
 - https://www.promptingguide.ai/models/mistral-7b#capabilities
 
 # Erkenntnisse
- - grosse llm wie gpt4 (extern, daten, rechtliches) vs. lokales hosting (kleine modelle, langsam, hoher leistungsbedarf)
- - wir können kein eigenes llm trainieren und müssen bestehende benutzen, diese kennen die inhalte der kunden nicht
-   RAG wird für uns eine wichtige architektur sein
- - als sprache werden wir wohl python benutzen müssen um vielseitige und aktuelle auswahl an tools zu haben
-   das lokale hosting ist bereits einschränkung genug
- - app kann trotzdem auf blueprint aufbauen, nur die RAG chain wird mit python gebaut und bietet dann eine REST API für QA
- - wir haben viel zu lernen, verständnis ist hier wichtig, auch wenn wir die "tools" nur benutzen
- - daher schnelles prototyping mit docker compose (hosting), ollama (llm server), langchain (rag framework), chroma (vector db) und streamlit (proto app mit ui) hilfreich
- - Debugging mit LangSmith sehr hilfreich (Problem: warum macht er mir keine Referenzen mit den originalen Dateinamen)
+ - Es gibt zwei Richtungen
+   - Die grosse Sprachmodelle wie GPT (externr Betrieb, Datenschutz, Rechtliches, Ausland)
+   - Lokales Hosting mit öffentlichen Sprachmodellen (kleine Modelle, langsam, hoher Leistungsbedarf)
+ - Wir können kein eigenes LLM trainieren und müssen bestehende benutzen, diese kennen die Inhalte der kunden nicht.
+   Der RAG Ansatz wird für uns eine wichtige Architektur sein.
+ - Als Sprache werden wir wohl Python benutzen müssen um vielseitige und aktuelle Auswahl an Tools und Dokumentation/Beispielen zu haben.
+   Das lokale Hosting ist bereits Einschränkung genug.
+ - Die App kann trotzdem auf dem Blueprint aufbauen, nur die RAG-Chain wird mit Python gebaut und bietet dann eine REST API für QA-Abfragen.
+ - Wir haben viel zu lernen. Verständnis ist hier wichtig, auch wenn wir die "Tools" nur benutzen.
+ - Daher schnelles Prototyping mit Docker Compose (Hosting), Ollama (LLM Server), LangChain (RAG Framework), Chroma (Vector Datenbank) und Streamlit (Proto App mit UI) hilfreich.
+ - Debugging mit LangSmith sehr hilfreich (z.B. Warum macht er mir keine Referenzen mit den originalen Dateinamen?, Wie sieht der fertige Prompt aus?)
  - Prompt Engineering ist wichtig und schwierig!
- - LLM wechseln bedeutet auch Prompt wehseln und neu tüfteln, messen, tunen
- - OpenAI GPT ist deutlich schnellen als Ollama lokal, unklar wie viel macht das Model und wie viel das Hosting, bzw. die Hardware aus. 
+ - LLM wechseln bedeutet auch Prompt wehseln und neu tüfteln, messen, tunen.
+ - OpenAI GPT ist deutlich schnellen als Ollama lokal, unklar wie viel macht das Model und wie viel das Hosting, bzw. die Hardware aus.
+
  
