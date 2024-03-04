@@ -7,7 +7,10 @@
 
 # Starten
 ```bash
+# CPU only
 docker compose up --build
+# with GPU
+docker compose --file docker-compose_gpu.yml up --build
 ```
 
 # Benutze Sprachmodelle laden
