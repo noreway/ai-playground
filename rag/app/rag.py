@@ -18,20 +18,14 @@ from langchain import hub
 
 #from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI
 
 from langchain_community.document_loaders import ConfluenceLoader
 
 
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL')
-OLLAMA_MODELS = {
-    #'mistral': """
-    #    <s> [INST] You are an assistant for question-answering tasks. Use the following pieces of retrieved context 
-    #    to answer the question. If you don't know the answer, just say that you don't know. Use three sentences
-    #     maximum and keep the answer concise.[/INST] </s> 
-    #    [INST] Question: {question} 
-    #    Context: {context} 
-    #    Answer: [/INST]
-    #    """,
+
+PROMPT_TEMPLATES = {
     'mistral': """
         <s> [INST]
         You are an retrieval augmented generation assistant.
@@ -47,17 +41,6 @@ OLLAMA_MODELS = {
         References:
         [/INST]
         """,
-    #'llama2': """
-    #    [INST] <<SYS>>Answer the users question only taking into account the following context. 
-    #    If the user asks for information not found in the below context, do not answer.
-    #
-    #    <context>
-    #    {context}
-    #    </context>
-    #    <</SYS>>
-    #
-    #     {question} [/INST]
-    #    """,
     'llama2': """
         [INST] <<SYS>>
         Answer the users question only taking into account the following context.
@@ -139,76 +122,109 @@ OPENAI_ENABLED = os.environ["OPENAI_ENABLED"]
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 OPENAI_ORG_ID = os.environ["OPENAI_ORG_ID"]
 
-if OPENAI_ENABLED != "true":
-    OLLAMA_MODELS = {k: v for k, v in OLLAMA_MODELS.items() if not k.startswith('gpt')}
 ATLASSIAN_ENABLED = os.environ["ATLASSIAN_ENABLED"]
 ATLASSIAN_URL = os.environ["ATLASSIAN_URL"]
 ATLASSIAN_USERNAME = os.environ["ATLASSIAN_USERNAME"]
 ATLASSIAN_API_KEY = os.environ["ATLASSIAN_API_KEY"]
 
-class ChatAssistant:
 
-    def __init__(self, debug_print_func, model_name):
+class RagBuilder:
+    def __init__(self, debug_print_func):
         self.debug = debug_print_func
-        if model_name.startswith('gpt'):
-            self.model = ChatOpenAI(model_name=model_name, temperature=0.2,
-                openai_api_key=OPENAI_API_KEY, openai_organization=OPENAI_ORG_ID)
-        else:
-            self.model = ChatOllama(model=model_name, temperature=0.01, 
-                base_url=OLLAMA_BASE_URL)
-        self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
         self.chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
-        self.prompt = PromptTemplate.from_template(OLLAMA_MODELS[model_name])
+    
+    def list_knowledge_base_servers(self):
+        return ['local-chroma-db', 'azure-ai-search']
 
-    def ingest(self, collection_name: str, pdf_file_path: str, original_name: str):
+    def list_knowledge_bases(self, knowledge_base_server_name: str):
+        if knowledge_base_server_name == 'local-chroma-db':
+            collections = self.chroma_client.list_collections()
+            return map(lambda c: c.name, collections)
+        return []
+
+    def get_knowledge_base_details(self, knowledge_base_server_name: str, knowledge_base_name: str):
+        if knowledge_base_server_name == 'local-chroma-db':
+            collection = self.chroma_client.get_collection(knowledge_base_name)
+            #details = vars(collection)
+            details = {}
+            details['chunk-count'] = collection.count()
+            return details
+        return {}
+
+    def create_knowledge_base(self, knowledge_base_server_name: str, knowledge_base_name: str):
+        if knowledge_base_server_name == 'local-chroma-db':
+            collection = self.chroma_client.get_or_create_collection(knowledge_base_name)
+
+    def delete_knowledge_base(self, knowledge_base_server_name: str, knowledge_base_name: str):
+        if knowledge_base_server_name == 'local-chroma-db':
+            self.chroma_client.delete_collection(knowledge_base_name)
+
+    def list_model_servers(self):
+        return ['local_ollama', 'openai', 'azure-openai']
+
+    def list_models(self, model_server_name: str):
+        if model_server_name == 'local_ollama':
+            return ['mistral', 'llama2']
+        if model_server_name == 'openai':
+            return ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo-preview']
+        return []
+
+    def build_rag_assistant(self, knowledge_base_server_name: str, knowledge_base_name: str, model_server_name: str, model_name: str):
+        vector_store = None
+        model = None
+
+        if knowledge_base_server_name == 'local-chroma-db':
+            vector_store = Chroma(client=self.chroma_client, collection_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
+
+        if model_server_name == 'local_ollama':
+            model = ChatOllama(model=model_name, temperature=0.01, base_url=OLLAMA_BASE_URL)
+        elif model_server_name == 'openai':
+            model = ChatOpenAI(model_name=model_name, temperature=0.2, openai_api_key=OPENAI_API_KEY, openai_organization=OPENAI_ORG_ID)
+
+        prompt = PromptTemplate.from_template(PROMPT_TEMPLATES[model_name])
+
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1024, chunk_overlap=100)
+
+        return RagAssistant(self.debug, vector_store, model, prompt, text_splitter)
+
+
+class RagAssistant:
+
+    def __init__(self, debug_print_func, vector_store, model, prompt, text_splitter):
+        self.debug = debug_print_func
+        self.vector_store = vector_store
+        self.model = model
+        self.prompt = prompt
+        self.text_splitter = text_splitter
+
+    def add_pdf(self, collection_name: str, pdf_file_path: str, original_name: str):
         docs = PyPDFLoader(file_path=pdf_file_path).load()
         for doc in docs:
             doc.metadata['source'] = original_name
         self.debug('loaded docs', docs)
+        self.__add_docs(docs)
+
+    def add_confluence_page(self, collection_name: str, conf_space_key: str):
+        loader = ConfluenceLoader(url=ATLASSIAN_URL, username=ATLASSIAN_USERNAME, api_key=ATLASSIAN_API_KEY)
+        docs = loader.load(space_key=conf_space_key, limit=50)
+        self.debug(f'loaded docs from confluence space {conf_space_key}', docs)
+        self.__add_docs(docs)
+
+    def __add_docs(self, docs):
         chunks = self.text_splitter.split_documents(docs)
         self.debug('splitted chunks', chunks)
         chunks = filter_complex_metadata(chunks)
         self.debug('filtered chunks', chunks)
-        vector_store = self.__get_vector_store(collection_name)
-        vector_store.add_documents(documents=chunks)
+        self.vector_store.add_documents(documents=chunks)
 
-    def __get_vector_store(self, collection_name: str):
-        collection = self.chroma_client.get_or_create_collection(collection_name)
-        vector_store = Chroma(client=self.chroma_client, collection_name=collection_name, 
-            embedding_function=FastEmbedEmbeddings())
-        #self.debug('vector_store.get()', vector_store.get())
-        return vector_store
-
-    def __get_chain(self, vector_store):
-        retriever = vector_store.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs={
-                "k": 3,
-                "score_threshold": 0.5,
-            },
+    def ask(self, query: str):
+        retriever = self.vector_store.as_retriever(
+            #search_type = "similarity_score_threshold", search_kwargs = {"k": 3,"score_threshold": 0.5}
+            search_type = "similarity_score_threshold", search_kwargs = {"k": 6,"score_threshold": 0.3}
+            #search_type = "mmr", search_kwargs = {'k': 5, 'fetch_k': 50}
         )
-        return ({"context": retriever, "question": RunnablePassthrough()}
+        chain = ({"context": retriever, "question": RunnablePassthrough()}
                       | self.prompt
                       | self.model
                       | StrOutputParser())
-
-    def ask(self, collection_name: str, query: str):
-        vector_store = self.__get_vector_store(collection_name)
-        chain = self.__get_chain(vector_store)
         return chain.invoke(query)
-
-    def list_collections(self):
-        collections = self.chroma_client.list_collections()
-        return map(lambda c: c.name, collections)
-
-    def get_collection_details(self, collection_name: str):
-        collection = self.chroma_client.get_collection(collection_name)
-        details = vars(collection)
-        details['count'] = collection.count()
-        return details
-
-    def create_collections(self, collection_name: str):
-        collection = self.chroma_client.get_or_create_collection(collection_name)
-
-    def delete_collections(self, collection_name: str):
-        self.chroma_client.delete_collection(collection_name)
