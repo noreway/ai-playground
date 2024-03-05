@@ -118,7 +118,7 @@ def render_sidebar():
         for key, value in rb.get_knowledge_base_details(st.session_state['selected_kb_server'], st.session_state['selected_kb']).items():
             st.caption(f'  {key}: {value}')
 
-    if st.session_state['selected_kb']:
+    if st.session_state['assistant']:
         st.write(f'<font size="3">Add PDF to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)
         st.file_uploader('file_uploader', type=['pdf'], key='file_uploader', on_change=__on_add_pdf_to_kb,
             accept_multiple_files=True, label_visibility='collapsed')

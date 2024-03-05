@@ -18,9 +18,15 @@ from langchain import hub
 
 #from langchain_community.chat_models import ChatOpenAI
 from langchain_openai import ChatOpenAI
-from langchain_openai import AzureChatOpenAI
 
 from langchain_community.document_loaders import ConfluenceLoader
+
+from langchain_openai import AzureChatOpenAI
+
+from langchain_community.vectorstores.azuresearch import AzureSearch
+from azure.core.credentials import AzureKeyCredential
+from azure.search.documents.indexes import SearchIndexClient
+from azure.search.documents.indexes.models import SearchIndex
 
 
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL')
@@ -127,11 +133,15 @@ ATLASSIAN_URL = os.environ["ATLASSIAN_URL"]
 ATLASSIAN_USERNAME = os.environ["ATLASSIAN_USERNAME"]
 ATLASSIAN_API_KEY = os.environ["ATLASSIAN_API_KEY"]
 
+AZURE_SEARCH_ENDPOINT = os.environ["AZURE_SEARCH_ENDPOINT"]
+AZURE_SEARCH_KEY = os.environ["AZURE_SEARCH_KEY"]
+
 
 class RagBuilder:
     def __init__(self, debug_print_func):
         self.debug = debug_print_func
         self.chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
+        self.azure_search_index_client = SearchIndexClient(AZURE_SEARCH_ENDPOINT, AzureKeyCredential(AZURE_SEARCH_KEY))
     
     def list_knowledge_base_servers(self):
         return ['local-chroma-db', 'azure-ai-search']
@@ -140,6 +150,9 @@ class RagBuilder:
         if knowledge_base_server_name == 'local-chroma-db':
             collections = self.chroma_client.list_collections()
             return map(lambda c: c.name, collections)
+        if knowledge_base_server_name == 'azure-ai-search':
+            indexes = self.azure_search_index_client.list_index_names()
+            return indexes
         return []
 
     def get_knowledge_base_details(self, knowledge_base_server_name: str, knowledge_base_name: str):
@@ -149,15 +162,24 @@ class RagBuilder:
             details = {}
             details['chunk-count'] = collection.count()
             return details
+        if knowledge_base_server_name == 'azure-ai-search':
+            index = self.azure_search_index_client.get_index_statistics(index_name=knowledge_base_name)
+            #self.debug('azure search index statistics: ', index)
+            return index
         return {}
 
     def create_knowledge_base(self, knowledge_base_server_name: str, knowledge_base_name: str):
         if knowledge_base_server_name == 'local-chroma-db':
             collection = self.chroma_client.get_or_create_collection(knowledge_base_name)
+        elif knowledge_base_server_name == 'azure-ai-search':
+            #index = self.azure_search_index_client.create_index(SearchIndex(name=knowledge_base_name, fields=List[SearchField]))
+            AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
 
     def delete_knowledge_base(self, knowledge_base_server_name: str, knowledge_base_name: str):
         if knowledge_base_server_name == 'local-chroma-db':
             self.chroma_client.delete_collection(knowledge_base_name)
+        elif knowledge_base_server_name == 'azure-ai-search':
+            self.azure_search_index_client.delete_index(SearchIndex(knowledge_base_name))
 
     def list_model_servers(self):
         return ['local_ollama', 'openai', 'azure-openai']
@@ -167,6 +189,8 @@ class RagBuilder:
             return ['mistral', 'llama2']
         if model_server_name == 'openai':
             return ['gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo-preview']
+        if model_server_name == 'azure-openai':
+            return []
         return []
 
     def build_rag_assistant(self, knowledge_base_server_name: str, knowledge_base_name: str, model_server_name: str, model_name: str):
@@ -175,6 +199,8 @@ class RagBuilder:
 
         if knowledge_base_server_name == 'local-chroma-db':
             vector_store = Chroma(client=self.chroma_client, collection_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
+        elif knowledge_base_server_name == 'azure-ai-search':
+            vector_store = AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
 
         if model_server_name == 'local_ollama':
             model = ChatOllama(model=model_name, temperature=0.01, base_url=OLLAMA_BASE_URL)

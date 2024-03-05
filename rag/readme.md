@@ -4,7 +4,8 @@
 - LangSmith Konto erstellen und API Key generieren https://smith.langchain.com/ (optional)
 - OpenAI Konto erstellen und API Key generieren https://platform.openai.com/ (optional)
 - Atlassian API Key generieren (optional)
-- `.env.template` zu `.env` kopieren und Konfiguration anpassen (für LangSmith, OpenAI, Atlassian)
+- Azure AI Search Api Key generieren (optional)
+- `.env.template` zu `.env` kopieren und Konfiguration anpassen (für LangSmith, OpenAI, Atlassian und Azure)
 
 # Starten
 ```bash
@@ -53,3 +54,6 @@ Confluence Loader:
 
 Mistral Prompt:
 - https://www.promptingguide.ai/models/mistral-7b#capabilities
+
+Azure AI Search:
+ - https://medium.com/@ahmed.mohiuddin.architecture/ai-powered-confluence-search-using-langchain-azure-openai-and-azure-cognitive-search-f9765c625b70
