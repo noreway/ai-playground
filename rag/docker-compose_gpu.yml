@@ -43,6 +43,10 @@ services:
       - OPENAI_ENABLED=${OPENAI_ENABLED-false}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - ATLASSIAN_ENABLED=${ATLASSIAN_ENABLED-false}
+      - ATLASSIAN_URL=${ATLASSIAN_URL}
+      - ATLASSIAN_USERNAME=${ATLASSIAN_USERNAME}
+      - ATLASSIAN_API_KEY=${ATLASSIAN_API_KEY}
     depends_on:
       - ollama
       - chroma

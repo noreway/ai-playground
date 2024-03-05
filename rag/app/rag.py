@@ -16,8 +16,10 @@ from langchain.prompts import PromptTemplate
 from langchain.vectorstores.utils import filter_complex_metadata
 from langchain import hub
 
-from langchain_community.chat_models import ChatOpenAI
-#from langchain_openai import ChatOpenAI
+#from langchain_community.chat_models import ChatOpenAI
+from langchain_openai import ChatOpenAI
+
+from langchain_community.document_loaders import ConfluenceLoader
 
 
 OLLAMA_BASE_URL = os.environ.get('OLLAMA_BASE_URL')
@@ -139,6 +141,10 @@ OPENAI_ORG_ID = os.environ["OPENAI_ORG_ID"]
 
 if OPENAI_ENABLED != "true":
     OLLAMA_MODELS = {k: v for k, v in OLLAMA_MODELS.items() if not k.startswith('gpt')}
+ATLASSIAN_ENABLED = os.environ["ATLASSIAN_ENABLED"]
+ATLASSIAN_URL = os.environ["ATLASSIAN_URL"]
+ATLASSIAN_USERNAME = os.environ["ATLASSIAN_USERNAME"]
+ATLASSIAN_API_KEY = os.environ["ATLASSIAN_API_KEY"]
 
 class ChatAssistant:
 

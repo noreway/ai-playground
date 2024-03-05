@@ -3,7 +3,8 @@
 - Docker Desktop installieren https://www.docker.com/products/docker-desktop/
 - LangSmith Konto erstellen und API Key generieren https://smith.langchain.com/ (optional)
 - OpenAI Konto erstellen und API Key generieren https://platform.openai.com/ (optional)
-- `.env.template` zu `.env` kopieren und Konfiguration anpassen (für LangSmith und OpenAI)
+- Atlassian API Key generieren (optional)
+- `.env.template` zu `.env` kopieren und Konfiguration anpassen (für LangSmith, OpenAI, Atlassian)
 
 # Starten
 ```bash
