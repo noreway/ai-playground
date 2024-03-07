@@ -30,6 +30,8 @@ winpty docker exec -it ai-playground-rag_ollama ollama pull llama2
 # Links
 Gutes Tutorial:
 - https://medium.com/@vndee.huynh/build-your-own-rag-and-run-it-locally-langchain-ollama-streamlit-181d42805895
+  -> kurz: https://research.ibm.com/blog/retrieval-augmented-generation-RAG
+  -> lang: https://www.anyscale.com/blog/a-comprehensive-guide-for-building-rag-based-llm-applications-part-1
 
 LangChain:
 - https://nanonets.com/blog/langchain/
@@ -57,3 +59,11 @@ Mistral Prompt:
 
 Azure AI Search:
  - https://medium.com/@ahmed.mohiuddin.architecture/ai-powered-confluence-search-using-langchain-azure-openai-and-azure-cognitive-search-f9765c625b70
+ 
+Unterschied OpenAI vs. Azure OpenAI:
+ - https://www.uscloud.com/blog/the-differences-between-openai-and-microsoft-azure-openai/#:~:text=Your%20data%20is%20your%20own,grow%20using%20advanced%20artificial%20intelligence
+
+Vector database embedding functions:
+ - https://www.heise.de/hintergrund/Sinnvoll-geclustert-Smarte-Suche-mit-Vektoren-9639467.html
+ - https://www.heise.de/hintergrund/Sorgfaeltiger-als-ChatGPT-Embeddings-mit-Azure-OpenAI-Qdrant-und-Rust-9066795.html
+ - https://huggingface.co/datasets/mikeee/chroma-paraphrase-multilingual-mpnet-base-v2

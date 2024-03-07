@@ -143,6 +143,12 @@ class RagBuilder:
         self.chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
         self.azure_search_index_client = SearchIndexClient(AZURE_SEARCH_ENDPOINT, AzureKeyCredential(AZURE_SEARCH_KEY))
     
+    def __get_embedding():
+        # see model list: https://qdrant.github.io/fastembed/examples/Supported_Models/
+        #return FastEmbedEmbeddings(model_name='BAAI/bge-small-en-v1.5') # max 384 tokens
+        return FastEmbedEmbeddings(model_name='sentence-transformers/paraphrase-multilingual-mpnet-base-v2') # max 768 tokens
+        #return FastEmbedEmbeddings(model_name='intfloat/multilingual-e5-large') # max 1024 tokens
+
     def list_knowledge_base_servers(self):
         return ['local-chroma-db', 'azure-ai-search']
 
@@ -173,7 +179,7 @@ class RagBuilder:
             collection = self.chroma_client.get_or_create_collection(knowledge_base_name)
         elif knowledge_base_server_name == 'azure-ai-search':
             #index = self.azure_search_index_client.create_index(SearchIndex(name=knowledge_base_name, fields=List[SearchField]))
-            AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
+            AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=self.__get_embedding())
 
     def delete_knowledge_base(self, knowledge_base_server_name: str, knowledge_base_name: str):
         if knowledge_base_server_name == 'local-chroma-db':
@@ -198,9 +204,9 @@ class RagBuilder:
         model = None
 
         if knowledge_base_server_name == 'local-chroma-db':
-            vector_store = Chroma(client=self.chroma_client, collection_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
+            vector_store = Chroma(client=self.chroma_client, collection_name=knowledge_base_name, embedding_function=self.__get_embedding())
         elif knowledge_base_server_name == 'azure-ai-search':
-            vector_store = AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=FastEmbedEmbeddings())
+            vector_store = AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=self.__get_embedding())
 
         if model_server_name == 'local_ollama':
             model = ChatOllama(model=model_name, temperature=0.01, base_url=OLLAMA_BASE_URL)
