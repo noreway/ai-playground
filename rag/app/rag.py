@@ -143,7 +143,7 @@ class RagBuilder:
         self.chroma_client = chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
         self.azure_search_index_client = SearchIndexClient(AZURE_SEARCH_ENDPOINT, AzureKeyCredential(AZURE_SEARCH_KEY))
     
-    def __get_embedding():
+    def __get_embedding(self):
         # see model list: https://qdrant.github.io/fastembed/examples/Supported_Models/
         #return FastEmbedEmbeddings(model_name='BAAI/bge-small-en-v1.5') # max 384 tokens
         return FastEmbedEmbeddings(model_name='sentence-transformers/paraphrase-multilingual-mpnet-base-v2') # max 768 tokens
@@ -202,6 +202,7 @@ class RagBuilder:
     def build_rag_assistant(self, knowledge_base_server_name: str, knowledge_base_name: str, model_server_name: str, model_name: str):
         vector_store = None
         model = None
+        temp = 1
 
         if knowledge_base_server_name == 'local-chroma-db':
             vector_store = Chroma(client=self.chroma_client, collection_name=knowledge_base_name, embedding_function=self.__get_embedding())
@@ -209,9 +210,9 @@ class RagBuilder:
             vector_store = AzureSearch(azure_search_endpoint=AZURE_SEARCH_ENDPOINT, azure_search_key=AZURE_SEARCH_KEY, index_name=knowledge_base_name, embedding_function=self.__get_embedding())
 
         if model_server_name == 'local_ollama':
-            model = ChatOllama(model=model_name, temperature=0.01, base_url=OLLAMA_BASE_URL)
+            model = ChatOllama(model=model_name, temperature=temp, base_url=OLLAMA_BASE_URL)
         elif model_server_name == 'openai':
-            model = ChatOpenAI(model_name=model_name, temperature=0.2, openai_api_key=OPENAI_API_KEY, openai_organization=OPENAI_ORG_ID)
+            model = ChatOpenAI(model_name=model_name, temperature=temp, openai_api_key=OPENAI_API_KEY, openai_organization=OPENAI_ORG_ID)
 
         prompt = PromptTemplate.from_template(PROMPT_TEMPLATES[model_name])
 
