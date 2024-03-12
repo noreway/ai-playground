@@ -36,6 +36,7 @@ services:
       - OLLAMA_BASE_URL=${OLLAMA_BASE_URL-http://ollama:11434}
       - CHROMA_HOST=${CHROMA_HOST-chroma}
       - CHROMA_PORT=${CHROMA_PORT-8000}
+      - FASTEMBED_CACHE_PATH=/fastembed_cache
       - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
       - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
       - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT}
@@ -52,6 +53,8 @@ services:
     depends_on:
       - ollama
       - chroma
+    volumes:
+      - fastembed_cache:/fastembed_cache
     networks:
       - net
     ports:
@@ -63,6 +66,9 @@ volumes:
 
   chroma:
     name: '${COMPOSE_PROJECT_NAME}_chroma'
+
+  fastembed_cache:
+    name: '${COMPOSE_PROJECT_NAME}_fastembed_cache'
 
 networks:
   net:
