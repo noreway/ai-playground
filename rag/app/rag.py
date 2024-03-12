@@ -7,7 +7,7 @@ import chromadb
 from langchain_community.vectorstores import Chroma
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import FastEmbedEmbeddings
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, UnstructuredExcelLoader
 
 from langchain.schema.output_parser import StrOutputParser
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -187,7 +187,7 @@ class RagBuilder:
         if knowledge_base_server_name == 'local-chroma-db':
             self.chroma_client.delete_collection(knowledge_base_name)
         elif knowledge_base_server_name == 'azure-ai-search':
-            self.azure_search_index_client.delete_index(SearchIndex(knowledge_base_name))
+            self.azure_search_index_client.delete_index(knowledge_base_name)
 
     def list_model_servers(self):
         return ['local_ollama', 'openai', 'azure-openai']
@@ -232,8 +232,11 @@ class RagAssistant:
         self.prompt = prompt
         self.text_splitter = text_splitter
 
-    def add_pdf(self, collection_name: str, pdf_file_path: str, original_name: str):
-        docs = PyPDFLoader(file_path=pdf_file_path).load()
+    def add_file(self, collection_name: str, file_path: str, original_name: str):
+        if original_name.endswith('.pdf'):
+            docs = PyPDFLoader(file_path).load()
+        elif original_name.endswith('.xls') or original_name.endswith('.xlsx'):
+            docs = UnstructuredExcelLoader(file_path, mode="elements").load()
         for doc in docs:
             doc.metadata['source'] = original_name
         self.debug('loaded docs', docs)

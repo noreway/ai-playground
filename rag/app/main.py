@@ -49,7 +49,7 @@ def __on_delete_kb():
     st.session_state['selected_kb'] = None
     __on_change_llm_or_kb()
 
-def __on_add_pdf_to_kb():
+def __on_add_file_to_kb():
     kb_name = st.session_state['selected_kb']
     if not kb_name:
         st.session_state['messages'].append(('Please, select a knowledge base first.', False))
@@ -59,7 +59,7 @@ def __on_add_pdf_to_kb():
             tf.write(file.getbuffer())
             file_path = tf.name
         with st.session_state['ingestion_spinner'], st.spinner(f'Adding file {file.name}'):
-            st.session_state['assistant'].add_pdf(kb_name, file_path, file.name)
+            st.session_state['assistant'].add_file(kb_name, file_path, file.name)
         os.remove(file_path)
 
 def __on_add_confluence_space_to_kb():
@@ -119,8 +119,8 @@ def render_sidebar():
             st.caption(f'  {key}: {value}')
 
     if st.session_state['assistant']:
-        st.write(f'<font size="3">Add PDF to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)
-        st.file_uploader('file_uploader', type=['pdf'], key='file_uploader', on_change=__on_add_pdf_to_kb,
+        st.write(f'<font size="3">Add file to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)
+        st.file_uploader('file_uploader', type=['pdf', 'xls', 'xlsx'], key='file_uploader', on_change=__on_add_file_to_kb,
             accept_multiple_files=True, label_visibility='collapsed')
 
         st.write(f'<font size="3">Add Confluence space to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)
