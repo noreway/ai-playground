@@ -257,9 +257,13 @@ class RagAssistant:
 
     def ask(self, query: str):
         retriever = self.vector_store.as_retriever(
-            #search_type = "similarity_score_threshold", search_kwargs = {"k": 3,"score_threshold": 0.5}
-            search_type = "similarity_score_threshold", search_kwargs = {"k": 6,"score_threshold": 0.3}
-            #search_type = "mmr", search_kwargs = {'k': 5, 'fetch_k': 50}
+            #search_type = "similarity", search_kwargs = {"k": 3}
+            
+            #search_type = "similarity_score_threshold", search_kwargs = {"k": 6,"score_threshold": 0.3}
+            
+            # fetch 50 document using similarity search and select 6 using maximal marginal relevance 
+            search_type = "mmr", search_kwargs = {'k': 6, 'fetch_k': 50}
+            
         )
         chain = ({"context": retriever, "question": RunnablePassthrough()}
                       | self.prompt
