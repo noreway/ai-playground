@@ -120,7 +120,7 @@ def render_sidebar():
 
     if st.session_state['assistant']:
         st.write(f'<font size="3">Add file to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)
-        st.file_uploader('file_uploader', type=['pdf', 'xls', 'xlsx'], key='file_uploader', on_change=__on_add_file_to_kb,
+        st.file_uploader('file_uploader', type=['pdf', 'xls', 'xlsx', 'csv'], key='file_uploader', on_change=__on_add_file_to_kb,
             accept_multiple_files=True, label_visibility='collapsed')
 
         st.write(f'<font size="3">Add Confluence space to knowledge base {st.session_state["selected_kb"]}</font>', unsafe_allow_html=True)

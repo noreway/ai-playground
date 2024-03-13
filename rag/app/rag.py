@@ -7,7 +7,10 @@ import chromadb
 from langchain_community.vectorstores import Chroma
 from langchain_community.chat_models import ChatOllama
 from langchain_community.embeddings import FastEmbedEmbeddings
-from langchain_community.document_loaders import PyPDFLoader, UnstructuredExcelLoader
+from langchain_community.document_loaders import PyPDFLoader, UnstructuredExcelLoader, CSVLoader
+
+import csv
+from langchain_core.documents import Document
 
 from langchain.schema.output_parser import StrOutputParser
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -237,6 +240,17 @@ class RagAssistant:
             docs = PyPDFLoader(file_path).load()
         elif original_name.endswith('.xls') or original_name.endswith('.xlsx'):
             docs = UnstructuredExcelLoader(file_path, mode="elements").load()
+        elif original_name.endswith('.csv'):
+            #docs = CSVLoader(file_path, autodetect_encoding = True).load()
+            with open(file_path, 'r', newline='') as f:
+                csv_reader = csv.DictReader(f)
+                docs = []
+                for i, row in enumerate(csv_reader):
+                    doc = Document(
+                        page_content = '\n'.join(f'{k}: {v}' for k, v in row.items()),
+                        metadata = {'row': i}
+                    )
+                    docs.append(doc)
         for doc in docs:
             doc.metadata['source'] = original_name
         self.debug('loaded docs', docs)
