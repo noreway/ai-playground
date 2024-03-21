@@ -51,7 +51,7 @@ PROMPT_TEMPLATES = {
         [/INST]
         """,
     'llama2': """
-        [INST] <<SYS>>
+        <s>[INST] <<SYS>>
         Answer the users question only taking into account the following context.
         If the user asks for information not found in the below context, do not answer.
         All context documents containing relevant pieces of the answer must be referenced by source and page.
@@ -61,8 +61,7 @@ PROMPT_TEMPLATES = {
         </context>
         <</SYS>>
         
-        {question}
-        [/INST]
+        {question} [/INST]
         """,
     'gpt-3.5-turbo': """
         System:
