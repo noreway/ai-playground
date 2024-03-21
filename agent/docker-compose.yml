@@ -1,0 +1,22 @@
+version: '3'
+name: ai-playground-agent
+
+services:
+  app:
+    build: ./app
+    container_name: '${COMPOSE_PROJECT_NAME}_app'
+    environment:
+      - LANGCHAIN_TRACING_V2=${LANGCHAIN_TRACING_V2-false}
+      - LANGCHAIN_PROJECT=${LANGCHAIN_PROJECT}
+      - LANGCHAIN_ENDPOINT=${LANGCHAIN_ENDPOINT}
+      - LANGCHAIN_API_KEY=${LANGCHAIN_API_KEY}
+      - OPENAI_ENABLED=${OPENAI_ENABLED-false}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+    networks:
+      - net
+    ports:
+      - 8501:8501
+
+networks:
+  net:
