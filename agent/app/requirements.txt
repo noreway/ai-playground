@@ -1,9 +1,10 @@
-langchain==0.1.11
-langchain-community==0.0.27
-langchain-openai==0.0.8
-langsmith==0.1.23
+langchain==0.1.13
+langchain-community==0.0.29
+langchain-openai==0.1.1
+langsmith==0.1.31
+langchainhub==0.1.15
 
-streamlit==1.32.0
+streamlit==1.32.2
 streamlit-chat==0.1.1
 
 requests==2.31.0
