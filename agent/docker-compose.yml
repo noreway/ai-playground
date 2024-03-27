@@ -13,6 +13,7 @@ services:
       - OPENAI_ENABLED=${OPENAI_ENABLED-false}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - OPENAI_ASSISTANT_ID=${OPENAI_ASSISTANT_ID}
     networks:
       - net
     ports:

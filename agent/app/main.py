@@ -3,10 +3,18 @@
 import streamlit as st
 from streamlit_chat import message
 from ai import IlluminatingAI
+from assistant import AddressAssistantAI
 
-APP_NAME='AI Playground - Illuminating AI'
+APP_NAME='AI Playground - Agents'
 
 # ui handlers
+def __on_change_agent():
+    st.session_state['messages'] = []
+    if st.session_state['selected_agent'] == 'Illuminating AI':
+        st.session_state['assistant'] = IlluminatingAI()
+    else:
+        st.session_state['assistant'] = AddressAssistantAI()
+
 def __on_ask_question():
     user_text = st.session_state['user_input']
     if user_text:
@@ -29,7 +37,8 @@ def render_chat():
         st.button('Ask', on_click=__on_ask_question, disabled=not st.session_state['user_input'], use_container_width=True)
 
 def render_sidebar():
-    pass
+    st.subheader('Agent')
+    st.radio('Select Agent', key='selected_agent', options=['Illuminating AI', 'Address Assistant AI'], on_change=__on_change_agent)
 
 def render_page():
     # init first loop
