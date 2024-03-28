@@ -32,7 +32,7 @@ def render_chat():
     st.write(f'<font size="3">Question</font>', unsafe_allow_html=True)
     c1, c2 = st.columns([10,1])
     with c1:
-        st.text_input('user_input', key='user_input',  label_visibility='collapsed')
+        st.text_area('user_input', key='user_input',  label_visibility='collapsed')
     with c2:
         st.button('Ask', on_click=__on_ask_question, disabled=not st.session_state['user_input'], use_container_width=True)
 
@@ -44,10 +44,9 @@ def render_page():
     # init first loop
     if len(st.session_state) == 0:
         st.session_state['messages'] = []
+        st.session_state['selected_agent'] = 'Illuminating AI'
         st.session_state['assistant'] = IlluminatingAI()
     # init loop
-    st.session_state['ingestion_spinner'] = st.empty()
-    # render
     st.header(APP_NAME)
     render_chat()
     with st.sidebar:
