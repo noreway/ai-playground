@@ -64,14 +64,17 @@ def do_http_get_request(url: str):
 class IlluminatingAI:
     def __init__(self):
         # models: 'gpt-3.5-turbo', 'gpt-4', 'gpt-4-turbo-preview'
-        self.llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-        self.tools = [set_shelly_light_on, set_shelly_light_off, wait, do_http_get_request]
+        self.llm = ChatOpenAI(model="gpt-4-turbo-preview", temperature=0)
+        #self.tools = [set_shelly_light_on, set_shelly_light_off, wait, do_http_get_request]
+        self.tools = [do_http_get_request]
         self.chat_history = []
         self.prompt = ChatPromptTemplate.from_messages([
             (
                 "system", 
                 "You are very powerful light assistant. Use your tools to turn shelly controlled lights on or off. "
                 + "Ensure to use the correct API calls depending on the Shelly switch model generation."
+                + "You can use the endpoint /shelly to check the model and generation."
+                + "Useful link: https://shelly-api-docs.shelly.cloud/gen2/ComponentsAndServices/Switch#http-endpoint-relayid"
                 + "Your should always think about what to do, defining an action to take and observe the result. Your can iterate N times."
             ),
             (
