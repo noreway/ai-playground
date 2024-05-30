@@ -1,2 +1,5 @@
 .env
 rag/pdf/
+ragas/results/*
+openwebui/docs/*
+openwebui/docs-disabled/*

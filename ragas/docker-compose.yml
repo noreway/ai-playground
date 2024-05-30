@@ -1,0 +1,20 @@
+version: '3'
+name: ai-playground-ragas
+
+services:
+  app:
+    build: ./app
+    container_name: '${COMPOSE_PROJECT_NAME}_app'
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ORG_ID=${OPENAI_ORG_ID}
+      - OPENAI_ASSISTANT_ID=${OPENAI_ASSISTANT_ID}
+    volumes:
+      - ./results:/opt/app/results
+    networks:
+      - net
+    ports:
+      - 8501:8501
+
+networks:
+  net:
