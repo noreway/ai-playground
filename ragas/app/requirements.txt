@@ -1,8 +1,8 @@
 
 requests==2.32.3
 
-datasets==2.19.1
+datasets==2.19.2
 
-ragas==0.1.8
+ragas==0.1.9
 
 openai==1.30.5
